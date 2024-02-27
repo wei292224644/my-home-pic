@@ -14,20 +14,29 @@ const App: React.FC = () => {
         const formData = new FormData();
         fileList.forEach((file) => {
 
-            console.log(file.lastModified);
+            console.log(file);
             formData.append('files[]', file as FileType);
-            formData.append("lastModifieds[]", file.lastModified + "");
+            formData.append('lastModified', file.lastModified + "");
         });
 
-        console.log(formData);
         setUploading(true);
         // You can use any AJAX library you like
-        axios.post('http://192.168.66.70:3000/photo/upload', formData, {
+        axios.post('http://localhost:8080/photo/upload', formData, {
             onUploadProgress: progressEvent => {
                 console.log(progressEvent.loaded / progressEvent.total! * 100 | 0)
             },
-        }).then((data) => {
-            console.log(data);
+        }).then(({ data }) => {
+
+
+            for (let i = 0; i < fileList.length; i++) {
+                const { cacheFileId, cacheFilename } = data.data[i];
+                const file = fileList[i];
+                axios.post("http://localhost:8080/photo", {
+                    cacheFileId, cacheFilename,
+                    filename: file.name,
+                    date: file.lastModified
+                })
+            }
             // setFileList([]);
             message.success('upload successfully.');
         })
@@ -46,12 +55,12 @@ const App: React.FC = () => {
             newFileList.splice(index, 1);
             setFileList(newFileList);
         },
-        beforeUpload: (file,fl) => {
+        beforeUpload: (file, fl) => {
             setFileList([...fileList, ...fl]);
 
             return false;
         },
-        multiple:true,
+        multiple: true,
         fileList,
     };
 
