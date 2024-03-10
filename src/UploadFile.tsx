@@ -3,6 +3,7 @@ import { UploadOutlined } from '@ant-design/icons';
 import { Button, message, Upload } from 'antd';
 import type { GetProp, UploadFile, UploadProps } from 'antd';
 import axios from 'axios';
+import { PhotoList } from './pages/phtoto-list';
 
 type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
 
@@ -26,13 +27,14 @@ const App: React.FC = () => {
                 console.log(progressEvent.loaded / progressEvent.total! * 100 | 0)
             },
         }).then(({ data }) => {
-
-
             for (let i = 0; i < fileList.length; i++) {
                 const { cacheFileId, cacheFilename } = data.data[i];
                 const file = fileList[i];
+                const type = file.type?.startsWith("image") ? "Image" : "Video";
+
                 axios.post("http://localhost:8080/photo", {
                     cacheFileId, cacheFilename,
+                    type: type,
                     filename: file.name,
                     date: file.lastModified
                 })
@@ -78,6 +80,8 @@ const App: React.FC = () => {
             >
                 {uploading ? 'Uploading' : 'Start Upload'}
             </Button>
+
+            <PhotoList />
         </>
     );
 };
