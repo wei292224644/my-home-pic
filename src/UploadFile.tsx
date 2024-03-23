@@ -81,7 +81,6 @@ const App: React.FC = () => {
                 {uploading ? 'Uploading' : 'Start Upload'}
             </Button>
 
-            <PhotoList />
         </>
     );
 };
